@@ -1,0 +1,4 @@
+*.o
+scanner.c
+scanner
+!/scanner
