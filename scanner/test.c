@@ -6,7 +6,7 @@ int main()
 
   if (a == 10)
   {
-    printf("A es igual a 10")
+    printf("A es igual a 10");
   }
 
   printf(a);

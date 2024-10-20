@@ -51,6 +51,7 @@ DOUBLE                        "double"
 CHAR                          "char"
 BOOL                          "bool"
 RETURN                        "return"
+VOID                          "void"
 
 IF                            "if"
 ELSE                          "else"
@@ -94,6 +95,7 @@ WHILE                         "while"
 {CHAR}                        { return TOKEN_CHAR; }
 {BOOL}                        { return TOKEN_BOOL; }
 {RETURN}                      { return TOKEN_RETURN; }
+{VOID}                        { return TOKEN_VOID; }
 
 {IF}                          { return TOKEN_IF; }
 {ELSE}                        { return TOKEN_ELSE; }

@@ -34,6 +34,7 @@ typedef enum
   TOKEN_FOR = 286,
   TOKEN_WHILE = 287,
   TOKEN_IDENTIFIER = 288
+  TOKEN_VOID = 289
 } token_t;
 
 inline const char *token_str(token_t t)
@@ -104,6 +105,8 @@ inline const char *token_str(token_t t)
     return "<WHILE>";
   case TOKEN_IDENTIFIER:
     return "<IDENTIFIER>";
+  case TOKEN_VOID:
+    return "<VOID>";
   default:
     return "<UNKNOWN>";
   }
