@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int main()
+int main(int a, int b, int c)
 {
   int a = 10;
   int b = true;
