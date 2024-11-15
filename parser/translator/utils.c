@@ -66,3 +66,22 @@ char* create_variable_declaration(const char* type, const char* code) {
     return declaration;
 }
 
+char* create_formatted_code(const char* format, const char* str1, const char* str2) {
+    // Calcular la longitud total necesaria para la cadena resultante
+    size_t length = strlen(str1) + (str2 ? strlen(str2) : 0) + 5;
+    char* result = (char*)malloc(length);
+    
+    if (result == NULL) {
+        perror("Error al reservar memoria");
+        exit(EXIT_FAILURE);
+    }
+    
+    // Formatear la cadena utilizando el formato especificado
+    if (str2 != NULL) {
+        sprintf(result, format, str1, str2);
+    } else {
+        sprintf(result, format, str1);
+    }
+
+    return result;
+}

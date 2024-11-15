@@ -38,22 +38,26 @@ declaration_list:
     ;
 
 declaration:
-    variable_declaration
-    | function_declaration
+    variable_declaration { append_to_js_code(&js_code, 2, $1, "\n"); }
+    | function_declaration { append_to_js_code(&js_code, 2, $1, "\n"); }
     | function_call
     ;
 
 variable_declaration:
-    type TOKEN_IDENTIFIER TOKEN_END_SENTENCE { append_to_js_code(&js_code, 3, "let ", $2, ";\n"); }
-    | type assignation {
-        char* declaration = create_variable_declaration($1, $2);
-        append_to_js_code(&js_code, 2, declaration, "\n");
-        free(declaration);
-    }
+    type TOKEN_IDENTIFIER TOKEN_END_SENTENCE { $$ = create_formatted_code("let %s;\n", $2, NULL); }
+    | type assignation { $$ = create_formatted_code("let %s", $2, NULL); }
     ;
 
 function_declaration:
-    type TOKEN_IDENTIFIER TOKEN_PARENTHESIS_OPEN parameters TOKEN_PARENTHESIS_CLOSE function_body
+    type TOKEN_IDENTIFIER TOKEN_PARENTHESIS_OPEN parameters TOKEN_PARENTHESIS_CLOSE function_body {
+        char* text = NULL;
+        if ($4 == NULL) {
+            text = create_formatted_code("function %s()", $2, NULL);
+        } else {
+            text = create_formatted_code("function %s(%s)", $2, $4);
+        }
+        $$ = text;
+    }
     | TOKEN_VOID TOKEN_IDENTIFIER TOKEN_PARENTHESIS_OPEN parameters TOKEN_PARENTHESIS_CLOSE function_body
     ;
 
@@ -67,8 +71,12 @@ parameters:
     ;
 
 parameter_list:
-    parameter_list ',' parameter
-    | parameter
+    parameter_list ',' parameter {
+        $$ = (char*)malloc(strlen($1) + strlen($3) + 3); // Espacio para ", " y terminador nulo
+        sprintf($$, "%s, %s", $1, $3);
+        free($1); // Liberar memoria de la lista anterior
+    }
+    | parameter { $$ = $1; }
     ;
 
 parameter:
@@ -99,7 +107,7 @@ instruction_list:
     ;
 
 instruction:
-    variable_declaration
+    variable_declaration 
     | assignation
     | control_structure
     | return
@@ -107,8 +115,8 @@ instruction:
     ;
 
 assignation:
-    TOKEN_IDENTIFIER TOKEN_OP_ASSIGNMENT expression TOKEN_END_SENTENCE { $$ = create_assignment_code($1, $3, true); }
-    | TOKEN_IDENTIFIER TOKEN_OP_ASSIGNMENT expression { $$ = create_assignment_code($1, $3, false); }
+    TOKEN_IDENTIFIER TOKEN_OP_ASSIGNMENT expression TOKEN_END_SENTENCE { $$ = create_formatted_code("%s = %s;", $1, $3); }
+    | TOKEN_IDENTIFIER TOKEN_OP_ASSIGNMENT expression { $$ = create_formatted_code("%s = %s", $1, $3); }
     ;
 
 control_structure:

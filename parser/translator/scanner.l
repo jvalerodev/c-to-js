@@ -43,6 +43,7 @@ BRACKET_CLOSE                 ["}"]
 PARENTHESIS_OPEN              ["("]
 PARENTHESIS_CLOSE             [")"]
 END_SENTENCE                  [";"]
+COMMA                         [","]
 
 /* KEYWORDS */
 INT                           "int"
@@ -103,6 +104,7 @@ WHILE                         "while"
 {WHILE}                       { return TOKEN_WHILE; }
 
 {IDENTIFIER}                  { yylval = strdup(yytext); return TOKEN_IDENTIFIER; }
+{COMMA}                       { return ','; }
 
 .                             yyerror(); 
 
