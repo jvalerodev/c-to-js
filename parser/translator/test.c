@@ -1,10 +1,21 @@
 #include <stdio.h>
 
-int main(int a, int b)
-{
-  int a = 10;
-  a = 5;
-  
+int fibonacci(int n) {
+    int a = 0;
+    int b = 1;
+    int c;
 
-  return 0;
+    if (n == 0) {
+        a = 1;
+    } else if (n == 1) {
+        return b;
+    }
+
+    for (int i = 2; i <= n; i = i + 1) {
+        c = a + b;
+        a = b;
+        b = c;
+    }
+    
+    return b;
 }

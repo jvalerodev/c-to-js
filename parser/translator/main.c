@@ -29,8 +29,17 @@ int main(int argc, char* argv[]) {
     int result = yyparse();
 
     if (result == 0) {
-        printf("Parse successful!\n");
-        printf("Generated JavaScript code:\n%s\n", js_code);  // Imprime el código JavaScript generado
+        printf("Successful translation!\n");
+
+        FILE* js_file = fopen("output.js", "w");
+
+        if (js_file) {
+            fprintf(js_file, "%s", js_code);
+            fclose(js_file);
+            printf("JavaScript code saved to output.js\n");
+        } else {
+            printf("Failed to open output.js for writing.\n");
+        }
     } else {
         printf("Parse failed!\n");
     }

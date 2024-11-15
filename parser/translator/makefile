@@ -2,10 +2,10 @@ CXX = g++
 FLEX = flex
 BISON = bison -Wcounterexamples --defines=token.h
 
-all: validator
+all: translator
 
-validator: parser.o scanner.o main.o utils.o
-	$(CXX) scanner.o parser.o main.o utils.o -o validator
+translator: parser.o scanner.o main.o utils.o
+	$(CXX) scanner.o parser.o main.o utils.o -o translator
 
 parser.o: parser.c
 	$(CXX) -c parser.c
@@ -27,4 +27,4 @@ utils.o: utils.c utils.h
 
 .PHONY:
 clean:
-	$(RM) *.o parser.c parser.output token.h scanner.c validator
+	$(RM) *.o parser.c parser.output token.h scanner.c translator

@@ -53,6 +53,7 @@ CHAR                          "char"
 BOOL                          "bool"
 RETURN                        "return"
 VOID                          "void"
+PRINT                         "printf"
 
 IF                            "if"
 ELSE                          "else"
@@ -70,7 +71,7 @@ WHILE                         "while"
 {END_SENTENCE}                { return TOKEN_END_SENTENCE; }
 {INTEGER}                     { yylval = strdup(yytext); return TOKEN_INTEGER; }
 {FLOAT}                       { return TOKEN_FLOAT; }
-{STRING}                      { return TOKEN_STRING; }
+{STRING}                      { yylval = strdup(yytext); return TOKEN_STRING; }
 
 {OP_SUM}                      { return TOKEN_OP_SUM; }
 {OP_SUB}                      { return TOKEN_OP_SUB; }
@@ -97,6 +98,7 @@ WHILE                         "while"
 {BOOL}                        { return TOKEN_BOOL; }
 {RETURN}                      { return TOKEN_RETURN; }
 {VOID}                        { return TOKEN_VOID; }
+{PRINT}                       { return TOKEN_PRINT; }
 
 {IF}                          { return TOKEN_IF; }
 {ELSE}                        { return TOKEN_ELSE; }
