@@ -44,19 +44,17 @@ declaration:
     ;
 
 variable_declaration:
-    type TOKEN_IDENTIFIER TOKEN_END_SENTENCE { $$ = create_formatted_code("let %s;\n", $2, NULL); }
-    | type assignation { $$ = create_formatted_code("let %s", $2, NULL); }
+    type TOKEN_IDENTIFIER TOKEN_END_SENTENCE { $$ = concat(3, "let ", $2, ";\n"); }
+    | type assignation { $$ = concat(2, "let ", $2); }
     ;
 
 function_declaration:
     type TOKEN_IDENTIFIER TOKEN_PARENTHESIS_OPEN parameters TOKEN_PARENTHESIS_CLOSE function_body {
-        char* text = NULL;
         if ($4 == NULL) {
-            text = create_formatted_code("function %s()", $2, NULL);
+            $$ = concat(3, "function ", $2, "()", $6);
         } else {
-            text = create_formatted_code("function %s(%s)", $2, $4);
+            $$ = concat(6, "function ", $2, "(", $4, ")", $6);
         }
-        $$ = text;
     }
     | TOKEN_VOID TOKEN_IDENTIFIER TOKEN_PARENTHESIS_OPEN parameters TOKEN_PARENTHESIS_CLOSE function_body
     ;
@@ -97,13 +95,13 @@ type:
     ;
 
 function_body:
-    TOKEN_BRACKET_OPEN instruction_list TOKEN_BRACKET_CLOSE
-    | TOKEN_BRACKET_OPEN TOKEN_BRACKET_CLOSE
+    TOKEN_BRACKET_OPEN instruction_list TOKEN_BRACKET_CLOSE { $$ = concat(3, "{\n", $2, "\n}\n"); }
+    | TOKEN_BRACKET_OPEN TOKEN_BRACKET_CLOSE { $$ = concat(1, "{}\n"); }
     ;
 
 instruction_list:
-    instruction_list instruction
-    | instruction
+    instruction_list instruction { $$ = concat(2, $1, $2); }
+    | instruction { $$ = $1; }
     ;
 
 instruction:
@@ -115,8 +113,8 @@ instruction:
     ;
 
 assignation:
-    TOKEN_IDENTIFIER TOKEN_OP_ASSIGNMENT expression TOKEN_END_SENTENCE { $$ = create_formatted_code("%s = %s;", $1, $3); }
-    | TOKEN_IDENTIFIER TOKEN_OP_ASSIGNMENT expression { $$ = create_formatted_code("%s = %s", $1, $3); }
+    TOKEN_IDENTIFIER TOKEN_OP_ASSIGNMENT expression TOKEN_END_SENTENCE { $$ = concat(4, $1, " = ", $3, ";\n"); }
+    | TOKEN_IDENTIFIER TOKEN_OP_ASSIGNMENT expression { $$ = concat(3, $1, " = ", $3); }
     ;
 
 control_structure:

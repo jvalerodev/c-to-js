@@ -85,3 +85,42 @@ char* create_formatted_code(const char* format, const char* str1, const char* st
 
     return result;
 }
+
+char* concat(int num, ...) {
+    // Inicialización de la lista de argumentos
+    va_list args;
+    va_start(args, num);
+
+    // Calcular el tamaño total necesario
+    size_t total_length = 0;
+    for (int i = 0; i < num; i++) {
+        const char* current_string = va_arg(args, const char*);
+        if (current_string != NULL) {
+            total_length += strlen(current_string);
+        }
+    }
+
+    // Reservar espacio para la cadena resultante (+1 para el terminador nulo)
+    char* result = (char*)malloc(total_length + 1);
+    if (result == NULL) {
+        perror("Error al reservar memoria");
+        exit(EXIT_FAILURE);
+    }
+
+    // Reiniciar la lista de argumentos para la segunda pasada
+    va_start(args, num);
+
+    // Concatenar todas las cadenas
+    result[0] = '\0'; // Iniciar la cadena vacía
+    for (int i = 0; i < num; i++) {
+        const char* current_string = va_arg(args, const char*);
+        if (current_string != NULL) {
+            strcat(result, current_string);
+        }
+    }
+
+    // Finalizar la lista de argumentos
+    va_end(args);
+
+    return result;
+}
