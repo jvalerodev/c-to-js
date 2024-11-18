@@ -37,8 +37,12 @@ declaration:
     ;
 
 variable_declaration:
-    type TOKEN_IDENTIFIER TOKEN_END_SENTENCE
-    | type assignation
+    type TOKEN_IDENTIFIER optional_initialization TOKEN_END_SENTENCE
+    ;
+
+optional_initialization:
+    /* empty */
+    | TOKEN_OP_ASSIGNMENT expression
     ;
 
 function_declaration:
@@ -112,7 +116,7 @@ if_structure:
     ;
 
 for_structure:
-    TOKEN_FOR TOKEN_PARENTHESIS_OPEN variable_declaration expression TOKEN_END_SENTENCE assignation TOKEN_PARENTHESIS_CLOSE function_body
+    TOKEN_FOR TOKEN_PARENTHESIS_OPEN variable_declaration comparison_expression TOKEN_END_SENTENCE assignation TOKEN_PARENTHESIS_CLOSE function_body
     ;
 
 while_structure:
@@ -121,6 +125,7 @@ while_structure:
 
 return:
     TOKEN_RETURN expression TOKEN_END_SENTENCE
+    | TOKEN_RETURN TOKEN_END_SENTENCE
     ;
 
 expression:
@@ -128,13 +133,17 @@ expression:
     ;
 
 comparison_expression:
-    arithmetic_expression TOKEN_OP_GREATER arithmetic_expression
-    | arithmetic_expression TOKEN_OP_GREATER_EQUAL arithmetic_expression
-    | arithmetic_expression TOKEN_OP_LESS arithmetic_expression
-    | arithmetic_expression TOKEN_OP_LESS_EQUAL arithmetic_expression
-    | arithmetic_expression TOKEN_OP_EQUAL arithmetic_expression
-    | arithmetic_expression TOKEN_OP_NOT_EQUAL arithmetic_expression
+    arithmetic_expression comparison_operator arithmetic_expression
     | arithmetic_expression
+    ;
+
+comparison_operator:
+    TOKEN_OP_GREATER
+    | TOKEN_OP_GREATER_EQUAL
+    | TOKEN_OP_LESS
+    | TOKEN_OP_LESS_EQUAL
+    | TOKEN_OP_EQUAL
+    | TOKEN_OP_NOT_EQUAL
     ;
 
 arithmetic_expression:
@@ -151,6 +160,8 @@ term:
 
 factor:
     TOKEN_PARENTHESIS_OPEN expression TOKEN_PARENTHESIS_CLOSE
+    | TOKEN_IDENTIFIER TOKEN_PARENTHESIS_OPEN expression_list TOKEN_PARENTHESIS_CLOSE
+    | TOKEN_IDENTIFIER TOKEN_PARENTHESIS_OPEN TOKEN_PARENTHESIS_CLOSE
     | TOKEN_IDENTIFIER
     | TOKEN_INTEGER
     | TOKEN_FLOAT
