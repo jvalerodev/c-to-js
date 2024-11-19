@@ -6,7 +6,7 @@ int fibonacci(int n) {
     int c;
 
     if (n == 0) {
-        a = 1;
+        return a;
     } else if (n == 1) {
         return b;
     }
@@ -18,4 +18,10 @@ int fibonacci(int n) {
     }
     
     return b;
+}
+
+int main() {
+    int value = fibonacci(11);
+    printf(value);
+    return 0;
 }

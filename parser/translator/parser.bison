@@ -18,12 +18,16 @@ char* js_code = NULL;
 %token TOKEN_OP_SUM TOKEN_OP_SUB TOKEN_OP_MULTIPLIER TOKEN_OP_DIVIDER
 %token TOKEN_OP_ASSIGNMENT TOKEN_OP_EQUAL TOKEN_OP_NOT_EQUAL TOKEN_OP_NOT
 %token TOKEN_OP_GREATER TOKEN_OP_LESS TOKEN_OP_GREATER_EQUAL TOKEN_OP_LESS_EQUAL
+%token TOKEN_OP_AND TOKEN_OP_OR
 %token TOKEN_BRACKET_OPEN TOKEN_BRACKET_CLOSE
 %token TOKEN_PARENTHESIS_OPEN TOKEN_PARENTHESIS_CLOSE
 %token TOKEN_END_SENTENCE
 
 %left TOKEN_OP_SUM TOKEN_OP_SUB
 %left TOKEN_OP_MULTIPLIER TOKEN_OP_DIVIDER
+%left TOKEN_OP_OR
+%left TOKEN_OP_AND
+
 %nonassoc TOKEN_OP_GREATER TOKEN_OP_LESS TOKEN_OP_GREATER_EQUAL TOKEN_OP_LESS_EQUAL
 %nonassoc TOKEN_OP_EQUAL TOKEN_OP_NOT_EQUAL
 
@@ -44,8 +48,12 @@ declaration:
     ;
 
 variable_declaration:
-    type TOKEN_IDENTIFIER TOKEN_END_SENTENCE { $$ = concat(3, NULL, "let ", $2, ";\n"); }
-    | type assignation { $$ = concat(2, NULL, "let ", $2); }
+    type TOKEN_IDENTIFIER optional_initialization TOKEN_END_SENTENCE { $$ = concat(4, NULL, "let ", $2, $3, ";\n"); }
+    ;
+
+optional_initialization:
+    /* empty */ { $$ = NULL; }
+    | TOKEN_OP_ASSIGNMENT expression { $$ = concat(2, NULL, " = ", $2); }
     ;
 
 function_declaration:
@@ -60,7 +68,7 @@ function_call:
 
 parameters:
     parameter_list
-    | /* empty */
+    | /* empty */ { $$ = NULL; }
     ;
 
 parameter_list:
@@ -123,7 +131,7 @@ if_structure:
     ;
 
 for_structure:
-    TOKEN_FOR TOKEN_PARENTHESIS_OPEN variable_declaration expression TOKEN_END_SENTENCE assignation TOKEN_PARENTHESIS_CLOSE function_body { $$ = concat(7, NULL, "for (", $3, $4, ";", $6, ")", $8); }
+    TOKEN_FOR TOKEN_PARENTHESIS_OPEN variable_declaration comparison_expression TOKEN_END_SENTENCE assignation TOKEN_PARENTHESIS_CLOSE function_body { $$ = concat(7, NULL, "for (", $3, $4, ";", $6, ")", $8); }
     ;
 
 while_structure:
@@ -132,20 +140,29 @@ while_structure:
 
 return:
     TOKEN_RETURN expression TOKEN_END_SENTENCE { $$ = concat(3, NULL, "return ", $2, ";\n"); }
+    | TOKEN_RETURN TOKEN_END_SENTENCE { $$ = concat(1, NULL, "return;"); }
+    ;
+    
     ;
 
 expression:
-    comparison_expression
+    expression TOKEN_OP_OR comparison_expression { $$ = concat(3, NULL, $1, " || ", $3); }
+    | expression TOKEN_OP_AND comparison_expression { $$ = concat(3, NULL, $1, " && ", $3); }
+    | comparison_expression
     ;
 
 comparison_expression:
-    arithmetic_expression TOKEN_OP_GREATER arithmetic_expression { $$ = concat(3, NULL, $1, " > ", $3); }
-    | arithmetic_expression TOKEN_OP_GREATER_EQUAL arithmetic_expression { $$ = concat(3, NULL, $1, " >= ", $3); }
-    | arithmetic_expression TOKEN_OP_LESS arithmetic_expression { $$ = concat(3, NULL, $1, " < ", $3); }
-    | arithmetic_expression TOKEN_OP_LESS_EQUAL arithmetic_expression { $$ = concat(3, NULL, $1, " <= ", $3); }
-    | arithmetic_expression TOKEN_OP_EQUAL arithmetic_expression { $$ = concat(3, NULL, $1, " == ", $3); }
-    | arithmetic_expression TOKEN_OP_NOT_EQUAL arithmetic_expression { $$ = concat(3, NULL, $1, " != ", $3); }
+    arithmetic_expression comparison_operator arithmetic_expression { $$ = concat(3, NULL, $1, $2, $3); }
     | arithmetic_expression
+    ;
+
+comparison_operator:
+    TOKEN_OP_GREATER { $$ = concat(1, NULL, " > "); }
+    | TOKEN_OP_GREATER_EQUAL { $$ = concat(1, NULL, " >= "); }
+    | TOKEN_OP_LESS { $$ = concat(1, NULL, " < "); }
+    | TOKEN_OP_LESS_EQUAL { $$ = concat(1, NULL, " <= "); }
+    | TOKEN_OP_EQUAL { $$ = concat(1, NULL, " == "); }
+    | TOKEN_OP_NOT_EQUAL { $$ = concat(1, NULL, " != "); }
     ;
 
 arithmetic_expression:
@@ -161,7 +178,7 @@ term:
     ;
 
 factor:
-    TOKEN_PARENTHESIS_OPEN expression TOKEN_PARENTHESIS_CLOSE
+    TOKEN_IDENTIFIER TOKEN_PARENTHESIS_OPEN expression_list TOKEN_PARENTHESIS_CLOSE { $$ = concat(4, NULL, $1, "(", $3, ")"); }
     | TOKEN_IDENTIFIER
     | TOKEN_INTEGER
     | TOKEN_FLOAT
