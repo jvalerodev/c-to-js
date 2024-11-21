@@ -37,6 +37,8 @@ OP_LESS_EQUAL                 "<="
 OP_EQUAL                      "=="
 OP_NOT                        "!"
 OP_NOT_EQUAL                  "!="
+OP_AND                        "&&"
+OP_OR                         "||"
 
 BRACKET_OPEN                  ["{"]
 BRACKET_CLOSE                 ["}"]
@@ -53,6 +55,7 @@ CHAR                          "char"
 BOOL                          "bool"
 RETURN                        "return"
 VOID                          "void"
+PRINT                         "printf"
 
 IF                            "if"
 ELSE                          "else"
@@ -68,9 +71,9 @@ WHILE                         "while"
 
 {END_OF_LINE}                 { line_count++; }
 {END_SENTENCE}                { return TOKEN_END_SENTENCE; }
-{INTEGER}                     { return TOKEN_INTEGER; }
-{FLOAT}                       { return TOKEN_FLOAT; }
-{STRING}                      { return TOKEN_STRING; }
+{INTEGER}                     { yylval = strdup(yytext); return TOKEN_INTEGER; }
+{FLOAT}                       { yylval = strdup(yytext); return TOKEN_FLOAT; }
+{STRING}                      { yylval = strdup(yytext); return TOKEN_STRING; }
 
 {OP_SUM}                      { return TOKEN_OP_SUM; }
 {OP_SUB}                      { return TOKEN_OP_SUB; }
@@ -84,6 +87,8 @@ WHILE                         "while"
 {OP_EQUAL}                    { return TOKEN_OP_EQUAL; }
 {OP_NOT}                      { return TOKEN_OP_NOT; }
 {OP_NOT_EQUAL}                { return TOKEN_OP_NOT_EQUAL; }
+{OP_AND}                      { return TOKEN_OP_AND; }
+{OP_OR}                       { return TOKEN_OP_OR; }
 
 {BRACKET_OPEN}                { return TOKEN_BRACKET_OPEN; }
 {BRACKET_CLOSE}               { return TOKEN_BRACKET_CLOSE; }
@@ -97,13 +102,14 @@ WHILE                         "while"
 {BOOL}                        { return TOKEN_BOOL; }
 {RETURN}                      { return TOKEN_RETURN; }
 {VOID}                        { return TOKEN_VOID; }
+{PRINT}                       { return TOKEN_PRINT; }
 
 {IF}                          { return TOKEN_IF; }
 {ELSE}                        { return TOKEN_ELSE; }
 {FOR}                         { return TOKEN_FOR; }
 {WHILE}                       { return TOKEN_WHILE; }
 
-{IDENTIFIER}                  { return TOKEN_IDENTIFIER; }
+{IDENTIFIER}                  { yylval = strdup(yytext); return TOKEN_IDENTIFIER; }
 {COMMA}                       { return ','; }
 
 .                             yyerror(); 
